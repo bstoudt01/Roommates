@@ -66,6 +66,45 @@ namespace Roommates
             Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
             }
 
+
+            //creates new connection to roommate Repo
+            RoommateRepository roommateRepo = new RoommateRepository(CONNECTION_STRING);
+
+            // GET ALL ROOM MATES
+            Console.WriteLine("Getting All Roommates:");
+            Console.WriteLine();
+
+            List<Roommate> allRoommates = roommateRepo.GetAll();
+
+            foreach (Roommate roommate in allRoommates)
+            {
+                Console.WriteLine($"{roommate.Id} {roommate.Lastname}, {roommate.Firstname}");
+            }
+        
+            
+            //GET SINGLE Roommate ENTRY
+            Console.WriteLine("----------------------------");
+            Console.WriteLine("Getting Roommate with Id 1");
+            Roommate singleRoommate = roommateRepo.GetById(1);
+
+            Console.WriteLine($"{singleRoommate.Id} {singleRoommate.Firstname}, {singleRoommate.Lastname} {singleRoommate.RentPortion}");
+
+
+            // GET ALL ROOM MATES
+            Console.WriteLine("Getting All Roommates:");
+            Console.WriteLine();
+
+            List<Roommate> roommatesByRoomId = roommateRepo.GetRoommatesByRoomId(3);
+
+            foreach (Roommate roommate in roommatesByRoomId)
+            {
+                Console.WriteLine($"omgz, {roommate.Id} {roommate.Lastname}, {roommate.Firstname}");
+            }
+
+
+
         }
+
+
     }
 }
