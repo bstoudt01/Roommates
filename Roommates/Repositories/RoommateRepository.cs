@@ -68,8 +68,10 @@ namespace Roommates.Repositories
                         DateTime MoveInDateValue = reader.GetDateTime(MoveInDateColumnPosition);
 
                         int Room = reader.GetOrdinal("RoomId");
-                           //initally being set as null inside the object so it does not need to be declared outside of it.
-                        // Now let's create a new room object using the data from the database.
+                        int RoomIdValue = reader.GetInt32(Room);
+
+                        //initally being set as null inside the object so it does not need to be declared outside of it.
+                      
                         Roommate roommate = new Roommate
                         {
                             Id = idValue,
@@ -134,6 +136,8 @@ namespace Roommates.Repositories
             }
         }
 
+
+        //Roommates by RoomId
         //public List<Roommate> GetRoommatesByRoomId(int roomId)
         //Roommate objects should have a Room property
         public List<Roommate> GetRoommatesByRoomId(int roomId)
@@ -174,7 +178,7 @@ namespace Roommates.Repositories
                         int MoveInDateColumnPosition = reader.GetOrdinal("MoveInDate");
                         DateTime MoveInDateValue = reader.GetDateTime(MoveInDateColumnPosition);
 
-                        int Room = reader.GetOrdinal("RoomId");
+                        int RoomId = reader.GetOrdinal("RoomId");
                         //initally being set as null inside the object so it does not need to be declared outside of it.
                         // Now let's create a new room object using the data from the database.
                         Roommate roommate = new Roommate
@@ -201,5 +205,90 @@ namespace Roommates.Repositories
                 }
             }
         }
+
+        //Insert new Roommate
+        public void Insert(Roommate roommate)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    // These SQL parameters are annoying. Why can't we use string interpolation?
+                    // ... sql injection attacks!!!
+                    cmd.CommandText = @"INSERT INTO Roommate (FirstName, LastName, RentPortion, MoveInDate, RoomId) 
+                                         OUTPUT INSERTED.Id 
+                                         VALUES (@FirstName, @LastName, @RentPortion, @MoveInDate, @RoomId)";
+                    cmd.Parameters.AddWithValue("@FirstName", roommate.Firstname);
+                    cmd.Parameters.AddWithValue("@LastName", roommate.Lastname);
+                    cmd.Parameters.AddWithValue("@RentPortion", roommate.RentPortion);
+                    cmd.Parameters.AddWithValue("@MoveInDate", roommate.MoveInDate);
+
+                    //RoomId = handling Room Class that is used as a property inside of roommate, 
+                    //had to assign a variable equal to a room id (in program.cs) and then i could use that as the room object to be passed through
+                    cmd.Parameters.AddWithValue("@RoomId",roommate.Room.Id);
+
+
+                    int id = (int)cmd.ExecuteScalar();
+                    //The cmd.ExecuteScalar method does two things: First, it executes the SQL command against the database. 
+                    //Then it looks at the first thing that the database sends back (in our case this is just the Id it created for the room) and returns it.
+                    // ....room.id declared here now that the result has been returned (similar to seeing the result when using .then statements
+                    //with the rresult returned we have the Id that the SQL server assigned
+                    roommate.Id = id;
+                }
+            }
+        }
+
+
+        //Update Roommate Entry
+
+        
+        public void Update(Roommate roommate)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Roommate
+                                    SET FirstName = @FirstName,
+                                        LastName = @LastName,
+                                        RentPortion = @RentPortion,
+                                        MoveInDate = @MoveInDate,
+                                        RoomId = @RoomId
+                                    WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@FirstName", roommate.Firstname);
+                    cmd.Parameters.AddWithValue("@LastName", roommate.Lastname);
+                    cmd.Parameters.AddWithValue("@RentPortion", roommate.RentPortion);
+                    cmd.Parameters.AddWithValue("@MoveInDate", roommate.MoveInDate);
+                    cmd.Parameters.AddWithValue("@RoomId", roommate.Room.Id);
+                    cmd.Parameters.AddWithValue("@id", roommate.Id);
+
+                    cmd.ExecuteNonQuery();
+                    //We use this method when we want to execute a SQL command, but we don't expect anything back from the database.
+                }
+            }
+        }
+
+
+        /// <summary>
+        ///  Delete the roommate with the given id
+        /// </summary>
+        public void Delete(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "DELETE FROM Roommate WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+
     }
 }

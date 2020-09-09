@@ -28,14 +28,14 @@ namespace Roommates
                 Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
             }
 
-            //GET SINGLE ENTRY
+            //GET SINGLE ROOM ENTRY
             Console.WriteLine("----------------------------");
             Console.WriteLine("Getting Room with Id 1");
             Room singleRoom = roomRepo.GetById(1);
 
             Console.WriteLine($"{singleRoom.Id} {singleRoom.Name} {singleRoom.MaxOccupancy}");
 
-            //ADD ENTRY
+            //ADD ROOM ENTRY
             Room bathroom = new Room
             {
                 Name = "Bathroom",
@@ -49,7 +49,7 @@ namespace Roommates
             Console.WriteLine($"Added the new Room with id {bathroom.Id}");
 
 
-            //UPDATE object above"bathroom" on the property "maxoccupency" and set it equal to "3"...
+            //UPDATE object above"bathroom" on the property "maxoccupancy" and set it equal to "3"...
             bathroom.MaxOccupancy = 3;
             roomRepo.Update(bathroom);
             //get it from database
@@ -58,7 +58,7 @@ namespace Roommates
             Console.WriteLine($"{bathroomFromDB.Id} {bathroomFromDB.Name} {bathroomFromDB.MaxOccupancy}");
 
 
-            //DELETE ENTRY BY ID
+            //DELETE ROOM ENTRY BY ID
             roomRepo.Delete(bathroom.Id);
             //get all rooms and loop through them to show its deleted by delting the SQL assigned id of the entry
             allRooms = roomRepo.GetAll();
@@ -67,10 +67,15 @@ namespace Roommates
             }
 
 
-            //creates new connection to roommate Repo
-            RoommateRepository roommateRepo = new RoommateRepository(CONNECTION_STRING);
 
-            // GET ALL ROOM MATES
+            /*ROOMMATE TABLE QUERIES
+             *************************************************************************************************8
+            ROOMMATE TABLE QUERIES */
+
+         //creates new connection to roommate Repo
+         RoommateRepository roommateRepo = new RoommateRepository(CONNECTION_STRING);
+
+            // GET ALL ROOMMATES
             Console.WriteLine("Getting All Roommates:");
             Console.WriteLine();
 
@@ -90,7 +95,7 @@ namespace Roommates
             Console.WriteLine($"{singleRoommate.Id} {singleRoommate.Firstname}, {singleRoommate.Lastname} {singleRoommate.RentPortion}");
 
 
-            // GET ALL ROOM MATES
+            // GET ALL ROOMmate BY roomId
             Console.WriteLine("Getting All Roommates:");
             Console.WriteLine();
 
@@ -102,9 +107,45 @@ namespace Roommates
             }
 
 
+            //ADD ENTRY
+            //USED singleRoom that was declared above to be my object represntation that is passed through as an argument to my roommate as the room property
+            Roommate bestest  = new Roommate
+            {
+                Firstname = "Wife",
+                Lastname = "#1",
+                RentPortion = 50,
+                MoveInDate = new DateTime(2011,11,11),
+                Room = singleRoom,
+            };
+
+
+            roommateRepo.Insert(bestest);
+
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine($"Added the new Roommate id number {bestest.Id} / name: {bestest.Firstname} {bestest.Lastname} / MoveIn: {bestest.MoveInDate} {bestest.Room.Name}");
+            
+
+
+
+            //UPDATE object above "bestest roommate" on the property "last name" and set it equal to "#2"...
+            
+            bestest.Lastname = "#2";
+            roommateRepo.Update(bestest);
+            //get it from database
+            Roommate bestestFromDB = roommateRepo.GetById(bestest.Id);
+            //..then see it on the console
+            Console.WriteLine($"{bestestFromDB.Id} {bestestFromDB.Firstname} {bestestFromDB.Lastname}");
+
+
+            // DELETE ROOMMATE ENTRY BY ID
+            roommateRepo.Delete(bestest.Id);
+            //get all roommatess and loop through them to show its deleted by delting the SQL assigned id of the entry
+            allRoommates = roommateRepo.GetAll();
+            foreach (Roommate roommates in allRoommates)
+            {
+                Console.WriteLine($"{roommates.Id} {roommates.Lastname} {roommates.Firstname}");
+            }
 
         }
-
-
     }
 }
