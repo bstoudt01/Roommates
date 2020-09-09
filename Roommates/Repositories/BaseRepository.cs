@@ -32,5 +32,6 @@ namespace Roommates.Repositories
         ///   connection stays open only long enough to execute single command, and then close until another request is made
         /// </summary>
         protected SqlConnection Connection => new SqlConnection(_connectionString);
+        //this is enstanteated a few places. there is an instance on RoomRepositrory.cs, using F12 after selecting Connection on RoomRepository i was abble to get here from
     }
 }
